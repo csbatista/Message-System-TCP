@@ -4,9 +4,9 @@ import socket
 HOST = '10.0.0.3'     # Endereco IP do Servidor
 PORT = 55555            # Porta que o Servidor esta
 
-messages = [ 'This is the message. ',
-             'It will be sent ',
-             'in parts.',
+messages = [ 'This is the second message. ',
+             'It will be second sent ',
+             'in second parts.',
              ]
 server_address = (HOST, PORT)
 
