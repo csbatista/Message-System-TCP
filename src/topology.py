@@ -29,7 +29,7 @@ class MyTopo( Topo ):
         switch1 = self.addSwitch( 's1' )
 	switch2 = self.addSwitch( 's2' )
 	switch3 = self.addSwitch( 's3' )
-	switch4 = self.addSwitch( 's3' )
+	switch4 = self.addSwitch( 's4' )
         
         # Add links
         self.addLink(emissor1, switch1)
@@ -39,7 +39,7 @@ class MyTopo( Topo ):
         self.addLink(switch2, servidor)
         self.addLink(switch4, switch3)
         self.addLink(switch3, emissor2)
-        self.addLink(switch3, exibidor1001)
+        self.addLink(exibidor1001, switch3)
 
 
 topos = { 'mytopo': ( lambda: MyTopo() ) }
