@@ -103,9 +103,9 @@ def sendQEM(id_emissor, sequence_id):
 	size_msg = 0
 	msg = ""
 	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
-	fmt_str = "!hhhh"
+	fmt_str = "!hhhhh140s"
 
-	msg_bytes = struct.pack(fmt_str, QEM, origin_id, destination_id, sequence_id)
+	msg_bytes = struct.pack(fmt_str, QEM, origin_id, destination_id, sequence_id, size_msg, msg)
 
 	print str(s.getsockname()) + ': sending MSG'
 	s.send(msg_bytes)
@@ -113,7 +113,7 @@ def sendQEM(id_emissor, sequence_id):
 
 # RECEIVE RESPONSE FROM OI MESSAGE
 def receive():
-	fmt_str = "!hhhh"
+	fmt_str = "!hhhhh140s"
 	msg_size = struct.Struct(fmt_str).size
 	data = s.recv(msg_size)
 	#msg_bytes = struct.pack(fmt_str, *fields_list)
@@ -177,10 +177,6 @@ while(op != 0):
 
 	showOptions()
 	op = input()
-
-
-	# TODO: METHODS FOR OTHER TYPES OF MESSAGES
-	# Every message sent should increment the sequence_id
 
 
 sendFLW(id_emissor, sequence_id)
