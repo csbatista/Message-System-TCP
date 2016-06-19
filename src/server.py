@@ -14,7 +14,8 @@ ERRO = 4
 QEM = 5
 OKQEM = 6
 
-
+emissores = {}
+exibidores = {}
 # SERVER TODO:
 #  - CLEAN CODE - REMOVE ALL UNNECESSARY THINGS FROM EXAMPLES
 #  - TABLE TO TRANSLATE ID TO IP ADDRESS - ID IS RECEIVED ON OI MESSAGES
@@ -70,7 +71,11 @@ while inputs:
                 fields_list = struct.unpack(fmt_str, data) 
                 data = fields_list
                 if(data[0] == 0):  #received an OI
-                    print data[1], s.getpeername()
+                    exibidores[data[1]] = s.getpeername()[0]
+                    print exibidores
+                if(data[0] == 1):   #received an FLW
+                    del exibidores[data[1]]
+                    print exibidores
                 print 'received "%s" from %s' % (data, s.getpeername())
                 message_queues[s].put(data)
                 
@@ -107,14 +112,14 @@ while inputs:
                 msg_bytes = struct.pack(fmt_str, OK, origin_id, destination_id, sequence_id)
 
                 s.send(msg_bytes)
-            else:
-                print 'sending "ERRO" to', str(s.getpeername())
+            if(next_msg[0] == 5): #SE RECEBER UMA QEM
+                print 'sending "OK" to', str(s.getpeername())
                 fmt_str = "!hhhh"
                 origin_id = 0          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                 destination_id = next_msg[1]   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                 sequence_id = 0         # (4 bytes) mantem estado entre os pares e permite a implementacao da entrega confiavel para-e-espera
                 #timestamp = next_msg[4]  # (4 bytes) except for messages of type OK
-                msg_bytes = struct.pack(fmt_str, ERRO, origin_id, destination_id, sequence_id)
+                msg_bytes = struct.pack(fmt_str, OK, origin_id, destination_id, sequence_id)
 
                 s.send(msg_bytes)
 
@@ -129,16 +134,4 @@ while inputs:
 
         # Remove message queue
         del message_queues[s]
-'''
-while True:
-    con, cliente = tcp.accept()
-    print 'Conectado por', cliente
-    while True:
-        msg = con.recv(1024)
-        if not msg: break
-        msg = '>' + msg + '<'
-        print cliente, msg
-        con.send(msg)
-    print 'Finalizando conexao do cliente', cliente
-    con.close()
-'''
+
