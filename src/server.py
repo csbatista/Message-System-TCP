@@ -91,7 +91,7 @@ while inputs:
                 if(data[0] == 0):  
                     # add to the exibidores list
                     existe = False
-                    if(data[1] > 1000):
+                    if(data[1] > 999):
                         if data[1] not in exibidores:
                             exibidores[data[1]] = s
                             print exibidores
@@ -172,20 +172,41 @@ while inputs:
                 if(data[0] == 2):
 
                     fmt_str = "!hhhhh140s"
-                    origin_id = data[1]          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-                    destination_id = data[2]   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-                    sequence_id = data[3]         # (4 bytes) mantem estado entre os pares e permite a implementacao da entrega confiavel para-e-espera
-                    #timestamp = next_msg[4]  # (4 bytes) except for messages of type OK
 
-                    size_msg = data[4]
-                    msg = data[5]
+                    if(data[2] > 0):
+                        origin_id = data[1]          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+                        destination_id = data[2]   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+                        sequence_id = data[3]         # (4 bytes) mantem estado entre os pares e permite a implementacao da entrega confiavel para-e-espera
+                        #timestamp = next_msg[4]  # (4 bytes) except for messages of type OK
 
-                    msg_bytes = struct.pack(fmt_str, MSG, origin_id, destination_id, sequence_id, size_msg, msg)   
+                        size_msg = data[4]
+                        msg = data[5]
 
-                    socket_exibidor = exibidores[data[2]]
-                    message_queues[socket_exibidor].put(msg_bytes)
-                    if socket_exibidor not in outputs:
-                        outputs.append(socket_exibidor)
+                        msg_bytes = struct.pack(fmt_str, MSG, origin_id, destination_id, sequence_id, size_msg, msg)   
+
+                        socket_exibidor = exibidores[data[2]]
+                        message_queues[socket_exibidor].put(msg_bytes)
+                        if socket_exibidor not in outputs:
+                            outputs.append(socket_exibidor)
+                    else:
+                        print len(exibidores)
+                        for id_exibidor in exibidores:
+                            origin_id = data[1]          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+                            destination_id = id_exibidor   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+                            sequence_id = data[3]         # (4 bytes) mantem estado entre os pares e permite a implementacao da entrega confiavel para-e-espera
+                            #timestamp = next_msg[4]  # (4 bytes) except for messages of type OK
+
+                            size_msg = data[4]
+                            msg = data[5]
+
+                            msg_bytes = struct.pack(fmt_str, MSG, origin_id, destination_id, sequence_id, size_msg, msg)   
+
+                            socket_exibidor = exibidores[id_exibidor]
+                            message_queues[socket_exibidor].put(msg_bytes)
+                            if socket_exibidor not in outputs:
+                                outputs.append(socket_exibidor)
+
+
 
                     fmt_str = "!hhhhh140s"
                     origin_id = 0          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
@@ -242,4 +263,3 @@ while inputs:
 
         # Remove message queue
         del message_queues[s]
-
