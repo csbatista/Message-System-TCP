@@ -93,14 +93,14 @@ while inputs:
                     existe = False
                     if(data[1] > 1000):
                         if data[1] not in exibidores:
-                            exibidores[data[1]] = s.getpeername()[0]
+                            exibidores[data[1]] = s
                             print exibidores
                         else:
                             existe = True 
 
                     if(data[1] > 1 and data[1]< 1000):
                         if data[1] not in emissores:
-                            emissores[data[1]] = s.getpeername()[0]
+                            emissores[data[1]] = s
                             print emissores
                         else:
                             existe = True   
@@ -182,7 +182,10 @@ while inputs:
 
                     msg_bytes = struct.pack(fmt_str, MSG, origin_id, destination_id, sequence_id, size_msg, msg)   
 
-                    message_queues[s].put(msg_bytes)
+                    socket_exibidor = exibidores[data[2]]
+                    message_queues[socket_exibidor].put(msg_bytes)
+                    if socket_exibidor not in outputs:
+                        outputs.append(socket_exibidor)
 
                     fmt_str = "!hhhhh140s"
                     origin_id = 0          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
@@ -216,10 +219,11 @@ while inputs:
         else:
             # if it is OI, FLW or MSG
 
-            if(next_msg[0] == 0 or next_msg[0] == 1):
-                print 'sending "OK" to', str(next_msg[1]), str(s.getpeername())
+            if(next_msg[0] == 3):
+                print 'sending "OK" to', str(next_msg[2]), str(s.getpeername())
             if(next_msg[0] == 2):
                 print 'sending "MSG" to', str(next_msg[2]), str(s.getpeername())
+                print message_queues
             if(next_msg[0] == 5): #SE RECEBER UMA QEM
                 print 'sending "OKQEM" to', str(s.getpeername())
 

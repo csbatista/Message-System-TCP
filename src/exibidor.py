@@ -79,6 +79,8 @@ def receive():
 	fields_list = struct.unpack(fmt_str, data) 
 	data = get_msg(fields_list[0])
 	print '%s: received %s' % (s.getsockname(), data)
+	print
+	print "Message from", str(fields_list[1]) + ':', fields_list[5]
 
 	if(data == "MSG" and fields_list[5] == 'flw'):
 		return "FIM"
