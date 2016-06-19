@@ -40,12 +40,10 @@ def sendOI(id_emissor, sequence_id):
 	origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
 	destination_id = 0 			# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
 	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
-	size_msg = 0
-	msg = ""
 
-	fmt_str = "!hhhhh140s"
+	fmt_str = "!HHHI"
 
-	msg_bytes = struct.pack(fmt_str, OI, origin_id, destination_id, sequence_id, size_msg, msg)
+	msg_bytes = struct.pack(fmt_str, OI, origin_id, destination_id, sequence_id)
 
 	print str(s.getsockname()) + ': sending OI'
 	s.send(msg_bytes)
@@ -57,12 +55,10 @@ def sendFLW(id_emissor, sequence_id):
 	destination_id = 0 			# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
 	sequence_id = 0 			# AINDA NAO ESTA SENDO INCREMENTADA
 	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
-	size_msg = 0
-	msg = ""
 
-	fmt_str = "!hhhhh140s"
+	fmt_str = "!HHHI"
 
-	msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id, size_msg, msg)
+	msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id)
 
 	print str(s.getsockname()) + ': sending FLW'
 	s.send(msg_bytes)
@@ -82,7 +78,7 @@ def sendMSG(id_emissor, sequence_id):
 	print "Type the message (max 140 characters)"
 	msg = raw_input()
 	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
-	fmt_str = "!hhhhh140s"
+	fmt_str = "!HHHIH140s"
 
 	msg_bytes = struct.pack(fmt_str, MSG, origin_id, destination_id, sequence_id, size_msg, msg)
 
@@ -103,7 +99,7 @@ def sendQEM(id_emissor, sequence_id):
 	size_msg = 0
 	msg = ""
 	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
-	fmt_str = "!hhhhh140s"
+	fmt_str = "!HHHIH140s"
 
 	msg_bytes = struct.pack(fmt_str, QEM, origin_id, destination_id, sequence_id, size_msg, msg)
 
@@ -113,9 +109,8 @@ def sendQEM(id_emissor, sequence_id):
 
 # RECEIVE RESPONSE FROM OI MESSAGE
 def receive():
-	fmt_str = "!hhhhh140s"
-	msg_size = struct.Struct(fmt_str).size
-	data = s.recv(msg_size)
+	fmt_str = "!HHHI"
+	data = s.recv(1024)
 	#msg_bytes = struct.pack(fmt_str, *fields_list)
 
 	fields_list = struct.unpack(fmt_str, data) 

@@ -78,12 +78,12 @@ while inputs:
 
 
         else:
-            fmt_str = "!hhhhh140s"
-            msg_size = struct.Struct(fmt_str).size
-            data = s.recv(msg_size)
-            if data:
+            fmt_str = "!HHHI"
+            data_received = s.recv(1024)
+            if data_received:
                 #msg_bytes = struct.pack(fmt_str, *fields_list)
-                fields_list = struct.unpack(fmt_str, data) 
+                fields_list = struct.unpack_from(fmt_str, data_received) 
+
                 data = fields_list
                 print 'received "%s" from %s' % (get_msg(data[0]), s.getpeername()) 
 
@@ -108,30 +108,26 @@ while inputs:
 
                     if not existe:
 
-                        fmt_str = "!hhhhh140s"
+                        fmt_str = "!HHHI"
                         origin_id = 0          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                         destination_id = data[1]   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                         sequence_id = 0         # (4 bytes) mantem estado entre os pares e permite a implementacao da entrega confiavel para-e-espera
                         #timestamp = next_msg[4]  # (4 bytes) except for messages of type OK
-                        size_msg = 0
-                        msg = ""
 
-                        msg_bytes = struct.pack(fmt_str, OK, origin_id, destination_id, sequence_id, size_msg, msg)
+                        msg_bytes = struct.pack(fmt_str, OK, origin_id, destination_id, sequence_id)
 
                         message_queues[s].put(msg_bytes)
 
                     else:
                         print "ja existe esse id" #retornar erro
 
-                        fmt_str = "!hhhhh140s"
+                        fmt_str = "!HHHI"
                         origin_id = 0          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                         destination_id = data[1]   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                         sequence_id = 0         # (4 bytes) mantem estado entre os pares e permite a implementacao da entrega confiavel para-e-espera
                         #timestamp = next_msg[4]  # (4 bytes) except for messages of type OK
-                        size_msg = 0
-                        msg = ""
 
-                        msg_bytes = struct.pack(fmt_str, ERRO, origin_id, destination_id, sequence_id, size_msg, msg)  
+                        msg_bytes = struct.pack(fmt_str, ERRO, origin_id, destination_id, sequence_id)  
 
                         message_queues[s].put(msg_bytes)
 
@@ -139,41 +135,35 @@ while inputs:
 
                 # received an FLW
                 if(data[0] == 1):   
-                    # remove from the exibidores list
-                    del exibidores[data[1]]
-                    print exibidores
+                    # remove from the emissores list
+                    if(data[1] > 1 and data[1]< 1000):
+                        del emissores[data[1]]
+                        print emissores
+                    if(data[1] > 999):
+                        del exibidores[data[1]]
+                        print exibidores
 
                     print 'closing', client_address, 'after FLW'
-                    # Stop listening for input on the connection
-                    if s in outputs:
-                        outputs.remove(s)
-                    inputs.remove(s)
-                    s.close()
 
-                    # Remove message queue
-                    del message_queues[s]
-
-                    msg_byte
-
-                    fmt_str = "!hhhhh140s"
+                    fmt_str = "!HHHI"
                     origin_id = 0          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                     destination_id = data[1]   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                     sequence_id = 0         # (4 bytes) mantem estado entre os pares e permite a implementacao da entrega confiavel para-e-espera
                     #timestamp = next_msg[4]  # (4 bytes) except for messages of type OK
-                    size_msg = 0
-                    msg = ""
 
-                    msg_bytes = struct.pack(fmt_str, OK, origin_id, destination_id, sequence_id, size_msg, msg)
+                    msg_bytes = struct.pack(fmt_str, OK, origin_id, destination_id, sequence_id)
 
                     message_queues[s].put(msg_bytes)
-
+                
 
                 # received an MSG
                 if(data[0] == 2):
 
-                    fmt_str = "!hhhhh140s"
+                    fmt_str = "!HHHIH140s"
+                    fields_list = struct.unpack(fmt_str, data_received) 
+                    data = fields_list
 
-                    if(data[2] > 0):
+                    if(data[2] > 0): # if it is only for one exibidor
                         origin_id = data[1]          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                         destination_id = data[2]   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                         sequence_id = data[3]         # (4 bytes) mantem estado entre os pares e permite a implementacao da entrega confiavel para-e-espera
@@ -188,12 +178,13 @@ while inputs:
                         message_queues[socket_exibidor].put(msg_bytes)
                         if socket_exibidor not in outputs:
                             outputs.append(socket_exibidor)
-                    else:
+
+                    else: # if it is for all exibidores
                         print len(exibidores)
                         for id_exibidor in exibidores:
-                            origin_id = data[1]          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-                            destination_id = id_exibidor   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-                            sequence_id = data[3]         # (4 bytes) mantem estado entre os pares e permite a implementacao da entrega confiavel para-e-espera
+                            origin_id = data[1]          
+                            destination_id = id_exibidor   
+                            sequence_id = data[3]         
                             #timestamp = next_msg[4]  # (4 bytes) except for messages of type OK
 
                             size_msg = data[4]
@@ -208,16 +199,13 @@ while inputs:
 
 
 
-                    fmt_str = "!hhhhh140s"
+                    fmt_str = "!HHHI"
                     origin_id = 0          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                     destination_id = data[1]   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
                     sequence_id = data[3]         # (4 bytes) mantem estado entre os pares e permite a implementacao da entrega confiavel para-e-espera
                     #timestamp = next_msg[4]  # (4 bytes) except for messages of type OK
 
-                    size_msg = 0
-                    msg = ""
-
-                    msg_bytes = struct.pack(fmt_str, OK, origin_id, destination_id, sequence_id, size_msg, msg)
+                    msg_bytes = struct.pack(fmt_str, OK, origin_id, destination_id, sequence_id)
 
                     message_queues[s].put(msg_bytes)
                 
@@ -225,13 +213,25 @@ while inputs:
                 
                 if s not in outputs:
                     outputs.append(s)
+
+            else:
+                # Interpret empty result as closed connection
+                print 'closing', client_address, 'after reading no data'
+                # Stop listening for input on the connection
+                if s in outputs:
+                    outputs.remove(s)
+                inputs.remove(s)
+                s.close()
+
+                # Remove message queue
+                del message_queues[s]
                 
     # Handle outputs
     for s in writable:
         try:
-            fmt_str = "!hhhhh140s"
+            fmt_str = "!HHHI"
             next_msg2 = message_queues[s].get_nowait()
-            next_msg = struct.unpack(fmt_str, next_msg2)
+            next_msg = struct.unpack_from(fmt_str, next_msg2)
             
         except Queue.Empty:
             # No messages waiting so stop checking for writability.
@@ -248,9 +248,10 @@ while inputs:
             if(next_msg[0] == 5): #SE RECEBER UMA QEM
                 print 'sending "OKQEM" to', str(s.getpeername())
 
-
-            print "sending"
-            s.send(next_msg2)
+            
+            else:
+                print "sending"
+                s.send(next_msg2)
 
     # Handle "exceptional conditions"
     for s in exceptional:

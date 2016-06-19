@@ -40,12 +40,11 @@ def sendOI(id_exibidor, sequence_id):
 	origin_id = id_exibidor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
 	destination_id = 0 			# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
 	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
-	size_msg = 0
-	msg = ""
 
-	fmt_str = "!hhhhh140s"
 
-	msg_bytes = struct.pack(fmt_str, OI, origin_id, destination_id, sequence_id, size_msg, msg)
+	fmt_str = "!HHHI"
+
+	msg_bytes = struct.pack(fmt_str, OI, origin_id, destination_id, sequence_id)
 
 	print str(s.getsockname()) + ': sending OI'
 	s.send(msg_bytes)
@@ -55,14 +54,11 @@ def sendOI(id_exibidor, sequence_id):
 def sendFLW(id_exibidor, sequence_id):
 	origin_id = id_exibidor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
 	destination_id = 0 			# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-	sequence_id = 0 			# AINDA NAO ESTA SENDO INCREMENTADA
 	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
-	size_msg = 0
-	msg = ""
 
-	fmt_str = "!hhhhh140s"
+	fmt_str = "!HHHI"
 
-	msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id, size_msg, msg)
+	msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id)
 
 	print str(s.getsockname()) + ': sending FLW'
 	s.send(msg_bytes)
@@ -71,16 +67,18 @@ def sendFLW(id_exibidor, sequence_id):
 
 # RECEIVE RESPONSE FROM MESSAGE
 def receive():
-	fmt_str = "!hhhhh140s"
-	msg_size = struct.Struct(fmt_str).size
-	data = s.recv(msg_size)
+	fmt_str = "!HHHIH140s"
+	data_received = s.recv(1024)
 	#msg_bytes = struct.pack(fmt_str, *fields_list)
 
-	fields_list = struct.unpack(fmt_str, data) 
+	fields_list = struct.unpack_from("!HHHI", data_received) 
 	data = get_msg(fields_list[0])
+
+
 	print '%s: received %s' % (s.getsockname(), data)
-	
+
 	if(data == "MSG"):
+		fields_list = struct.unpack(fmt_str, data_received) 
 		print "Message from", str(fields_list[1]) + ':', fields_list[5]
 
 	if(data == "MSG" and fields_list[5] == 'flw'):
