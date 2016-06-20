@@ -12,13 +12,42 @@
 \maketitle
 
 \section{Introdução}
-Neste trabalho desenvolvemos um sistema de mensagens usando o protocolo TCP e orientação a eventos.
+Neste trabalho desenvolvemos um sistema de mensagens usando o protocolo TCP e orientação a eventos. O sistema foi desenvolvido em três módulos separados, servidor, exibidor e emissor.\\O servidor é o módulo responsável pela intermediação das mensagens trocadas pelos clientes, o exibidor exibe as mensagens recebidas pelo seu emissor, e o emissor envia mensagens para outros clientes.
 
 
 \section{Decisões de Projeto}
+\subsection{Estrutura do Projeto}
+O sistema de mensagens foi separado em três módulos: Servidor, emissor e exibidor.
+
+\subsubsection{Servidor}
+O servidor fica em src/server.py
+\subsubsection{Emissor}
+\subsubsection{Exibidor}
 
 
-\section{Testes}
+\subsection{Mensagens}
+Os únicos tipos de mensagens usadas neste projeto são as descritas na descrição do trabalho.
+\begin{enumerate}
+\item OI (0): A primeira mensagem mandada pelo emissor ou exibidor para o servidor. Ela serve para criar uma conexão entre duas terminações.
+
+\item FLW (1): Este tipo de mensagem serve para acabar conexões, ela pode ser enviada de um emissor para o servidor, de um emissor para um exibidor e de um exibidor para o servidor.
+Uma terminação do emissor não significa uma terminação do seu emissor, neste trabalho decidimos deixar os dois módulos do cliente separados nesta ação.
+
+\item MSG(2): Mensagem enviada de um cliente para outro, ela é escrita pelo próprio usuário.
+
+\item OK (3): Mensagem enviada pelo servidor para o cliente que mandou uma MSG. Um OK é retornado pelo servidor somente se a mensagem está bem formada.
+
+\item ERRO (4): O erro tem um papel parecido do nack, uma mensagem de erro é retornada pelo servidor quando um emissor, ou exibidor, pedem por um id já usado.
+
+\item QEM (5): Mensagem enviada por um cliente para o servidor para saber quais outros clientes estão registrados. Recebido um QEM pelo servidor, ele responde um OKQEM com os clientes abertos.
+
+\item OKQEM (6): Esta mensagem é uma resposta do servidor para o cliente que pediu para listar os outros clientes abertos.
+
+\end{enumerate}
+
+
+\section {Execução}
+Para executar o sistema de mensagens, execute primeiro o servidor com "python src/server.py" seguido pelos emissores e exibidores
 
 
 \section{Conclusão}
