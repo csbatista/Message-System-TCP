@@ -378,8 +378,6 @@ def handle_outputs(writable):
         #print message_queues
       if next_msg[0] == QEM : #SE RECEBER UMA QEM
         print 'LOG: Sending OKQEM to', str(next_msg[2])     
-      if next_msg[0] == ERROR:
-        print 'LOG: Sending an ERROR to', str(next_msg[2])     
       
       s.send(next_msg2)
 
