@@ -371,14 +371,16 @@ def handle_outputs(writable):
       outputs.remove(s)
     else:
       # if it is OI, FLW or MSG
-      if next_msg[0] == 3:
+      if next_msg[0] == OK:
         print 'LOG: Sending OK to', str(next_msg[2])
-      if next_msg[0] == 2:
+      if next_msg[0] == MSG:
         print 'LOG: Sending MSG to', str(next_msg[2])
         #print message_queues
-      if next_msg[0] == 5 : #SE RECEBER UMA QEM
+      if next_msg[0] == QEM : #SE RECEBER UMA QEM
         print 'LOG: Sending OKQEM to', str(next_msg[2])     
-
+      if next_msg[0] == ERROR:
+        print 'LOG: Sending an ERROR to', str(next_msg[2])     
+      
       s.send(next_msg2)
 
 
