@@ -72,17 +72,17 @@ def sendExibidorFLW(id_emissor, sequence_id):
   sequence_id = 0       # AINDA NAO ESTA SENDO INCREMENTADA
   #TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
 
-  print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
+  print "What is the ID of the exibidor?"
   destination_id = input()
   while(destination_id != 0 and destination_id < 1000):
     print "That is not a valid ID. Exibidor ID's should be bigger than 1000"
-    print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
+    print "What is the ID of the exibidor?"
     destination_id = input()
-
+  
   fmt_str = "!HHHI"
-
+  
   msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id)
-
+  
   print str(s.getsockname()) + ': sending FLW'
   s.send(msg_bytes)
 

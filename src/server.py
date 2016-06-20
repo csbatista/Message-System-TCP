@@ -114,7 +114,7 @@ def process_flw(fmt_str, data, data_received, s):
       del exibidores[data[1]]
       print exibidores
     
-    print 'closing', client_address, 'after FLW'
+    print 'closing', s.getpeername(), 'after FLW'
     
     fmt_str = "!HHHI"
     origin_id = 0          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
