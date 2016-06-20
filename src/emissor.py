@@ -13,84 +13,84 @@ QEM = 5
 OKQEM = 6
 
 def get_msg(num):
-	return {
-		0: "OI",
-		1: "FLW",
-		2: "MSG",
-		3: "OK",
-		4: "ERRO",
-		5: "QEM",
-		6: "OKQEM"
-	}[num]
+  return {
+    0: "OI",
+    1: "FLW",
+    2: "MSG",
+    3: "OK",
+    4: "ERRO",
+    5: "QEM",
+    6: "OKQEM"
+  }[num]
 
 
 
 # GET EMISSOR ID
 def getEmissorID():
-	print "Enter emissor ID: "
-	id_emissor = input()
-	while (id_emissor < 1 or id_emissor > 999):
-		print "Enter emissor ID: "
-		id_emissor = input()
-	return id_emissor
+  print "Enter emissor ID: "
+  id_emissor = input()
+  while (id_emissor < 1 or id_emissor > 999):
+    print "Enter emissor ID: "
+    id_emissor = input()
+  return id_emissor
 
 
 
 # SEND OI MESSAGE
 def sendOI(id_emissor, sequence_id):
-	origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-	destination_id = 0 			# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
+  origin_id = id_emissor     # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+  destination_id = 0       # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+  #TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
 
-	fmt_str = "!HHHI"
+  fmt_str = "!HHHI"
 
-	msg_bytes = struct.pack(fmt_str, OI, origin_id, destination_id, sequence_id)
+  msg_bytes = struct.pack(fmt_str, OI, origin_id, destination_id, sequence_id)
 
-	print str(s.getsockname()) + ': sending OI'
-	s.send(msg_bytes)
+  print str(s.getsockname()) + ': sending OI'
+  s.send(msg_bytes)
 
 
 
 # SEND FLW MESSAGE
 def sendFLW(id_emissor, sequence_id):
-	origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-	destination_id = 0 			# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-	sequence_id = 0 			# AINDA NAO ESTA SENDO INCREMENTADA
-	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
+  origin_id = id_emissor     # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+  destination_id = 0       # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+  sequence_id = 0       # AINDA NAO ESTA SENDO INCREMENTADA
+  #TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
 
-	fmt_str = "!HHHI"
+  fmt_str = "!HHHI"
 
-	msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id)
+  msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id)
 
-	print str(s.getsockname()) + ': sending FLW'
-	s.send(msg_bytes)
+  print str(s.getsockname()) + ': sending FLW'
+  s.send(msg_bytes)
 
 
 
 def sendExibidorFLW(id_emissor, sequence_id):
-	origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-	sequence_id = 0 			# AINDA NAO ESTA SENDO INCREMENTADA
-	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
+  origin_id = id_emissor     # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+  sequence_id = 0       # AINDA NAO ESTA SENDO INCREMENTADA
+  #TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
 
-	print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
-	destination_id = input()
-	while(destination_id != 0 and destination_id < 1000):
-		print "That is not a valid ID. Exibidor ID's should be bigger than 1000"
-		print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
-		destination_id = input()
+  print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
+  destination_id = input()
+  while(destination_id != 0 and destination_id < 1000):
+    print "That is not a valid ID. Exibidor ID's should be bigger than 1000"
+    print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
+    destination_id = input()
 
-	fmt_str = "!HHHI"
+  fmt_str = "!HHHI"
 
-	msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id)
+  msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id)
 
-	print str(s.getsockname()) + ': sending FLW'
-	s.send(msg_bytes)
+  print str(s.getsockname()) + ': sending FLW'
+  s.send(msg_bytes)
 
 
 
 # SEND MSG MESSAGE
 def sendMSG(id_emissor, sequence_id):
-  origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+  origin_id = id_emissor     # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
   
   print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
   destination_id = input()
@@ -102,7 +102,7 @@ def sendMSG(id_emissor, sequence_id):
   size_msg = 2
   while True:
     print "Type the message (max 140 characters)"
-	  msg = raw_input()
+    msg = raw_input()
     if len(msg) > 140:
       print 'Message too big.'
     elif len(msg) == 0:
@@ -110,58 +110,58 @@ def sendMSG(id_emissor, sequence_id):
     else:
       break
   
-	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
-	fmt_str = "!HHHIH140s"
+  #TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
+  fmt_str = "!HHHIH140s"
   
   size_msg = len(msg)
-	msg_bytes = struct.pack(fmt_str, MSG, origin_id, destination_id, sequence_id, size_msg, msg)
+  msg_bytes = struct.pack(fmt_str, MSG, origin_id, destination_id, sequence_id, size_msg, msg)
 
-	print str(s.getsockname()) + ': sending MSG'
-	s.send(msg_bytes)
+  print str(s.getsockname()) + ': sending MSG'
+  s.send(msg_bytes)
 
 
 
 # SEND QEM MESSAGE
 def sendQEM(id_emissor, sequence_id):
-	origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
+  origin_id = id_emissor     # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
 
-	print "What is the ID of the exibidor?"
-	destination_id = input()
-	while(destination_id != 0 and destination_id < 1000):
-		print "That is not a valid ID. Exibidor ID's should be bigger than 1000"
-		print "What is the ID of the exibidor?"
-		destination_id = input()
+  print "What is the ID of the exibidor?"
+  destination_id = input()
+  while(destination_id != 0 and destination_id < 1000):
+    print "That is not a valid ID. Exibidor ID's should be bigger than 1000"
+    print "What is the ID of the exibidor?"
+    destination_id = input()
 
-	fmt_str = "!HHHI"
+  fmt_str = "!HHHI"
 
-	msg_bytes = struct.pack(fmt_str, QEM, origin_id, destination_id, sequence_id)
+  msg_bytes = struct.pack(fmt_str, QEM, origin_id, destination_id, sequence_id)
 
-	print str(s.getsockname()) + ': sending MSG'
-	s.send(msg_bytes)
+  print str(s.getsockname()) + ': sending MSG'
+  s.send(msg_bytes)
 
 
 
 
 # RECEIVE RESPONSE FROM OI MESSAGE
 def receive():
-	fmt_str = "!HHHI"
-	data = s.recv(1024)
-	#msg_bytes = struct.pack(fmt_str, *fields_list)
+  fmt_str = "!HHHI"
+  data = s.recv(1024)
+  #msg_bytes = struct.pack(fmt_str, *fields_list)
 
-	fields_list = struct.unpack(fmt_str, data) 
-	data = get_msg(fields_list[0])
-	print '%s: received %s' % (s.getsockname(), data)
-	return data
+  fields_list = struct.unpack(fmt_str, data) 
+  data = get_msg(fields_list[0])
+  print '%s: received %s' % (s.getsockname(), data)
+  return data
 
 
 
 # SHOW OPTIONS
 def showOptions():
-	print "Choose an option:"
-	print "(1) Send a message"
-	print "(2) Build an QEM message"
-	print "(3) Terminate exibidor"
-	print "(0) Terminate this"
+  print "Choose an option:"
+  print "(1) Send a message"
+  print "(2) Build an QEM message"
+  print "(3) Terminate exibidor"
+  print "(0) Terminate this"
 
 
 
