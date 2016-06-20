@@ -4,5 +4,5 @@
 
 - retornar erro quando o cara envia uma mensagem mas o campo de origem nao ta com o id dele (tipo ele tentando se passar por outra pessoa)
 
--retornar erro quando o destinatario nao existe
+- retornar erro quando o destinatario nao existe
 
