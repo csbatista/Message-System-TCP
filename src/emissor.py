@@ -1,5 +1,6 @@
 import socket
 import struct
+import time
 
 HOST = '10.0.0.3'     # Endereco IP do Servidor
 PORT = 55555            # Porta que o Servidor esta
@@ -40,13 +41,13 @@ def getEmissorID():
 def sendOI(id_emissor, sequence_id):
   origin_id = id_emissor     # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
   destination_id = 0       # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-  #TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
+  timestamp = (int(time.time()))
 
-  fmt_str = "!HHHI"
+  fmt_str = "!HHHII"
 
-  msg_bytes = struct.pack(fmt_str, OI, origin_id, destination_id, sequence_id)
+  msg_bytes = struct.pack(fmt_str, OI, origin_id, destination_id, sequence_id, timestamp)
 
-  print str(s.getsockname()) + ': sending OI'
+  print 'LOG: Sending OI to', destination_id
   s.send(msg_bytes)
 
 
@@ -56,13 +57,13 @@ def sendFLW(id_emissor, sequence_id):
   origin_id = id_emissor     # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
   destination_id = 0       # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
   sequence_id = 0       # AINDA NAO ESTA SENDO INCREMENTADA
-  #TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
+  timestamp = (int(time.time()))
 
-  fmt_str = "!HHHI"
+  fmt_str = "!HHHII"
 
-  msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id)
+  msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id, timestamp)
 
-  print str(s.getsockname()) + ': sending FLW'
+  print 'LOG: Sending FLW to', destination_id
   s.send(msg_bytes)
 
 
@@ -70,7 +71,7 @@ def sendFLW(id_emissor, sequence_id):
 def sendExibidorFLW(id_emissor, sequence_id):
   origin_id = id_emissor     # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
   sequence_id = 0       # AINDA NAO ESTA SENDO INCREMENTADA
-  #TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
+  timestamp = (int(time.time()))
 
   print "What is the ID of the exibidor?"
   destination_id = input()
@@ -79,11 +80,11 @@ def sendExibidorFLW(id_emissor, sequence_id):
     print "What is the ID of the exibidor?"
     destination_id = input()
   
-  fmt_str = "!HHHI"
+  fmt_str = "!HHHII"
   
-  msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id)
+  msg_bytes = struct.pack(fmt_str, FLW, origin_id, destination_id, sequence_id, timestamp)
   
-  print str(s.getsockname()) + ': sending FLW'
+  print 'LOG: Sending FLW to', destination_id
   s.send(msg_bytes)
 
 
@@ -98,6 +99,9 @@ def sendMSG(id_emissor, sequence_id):
     print "That is not a valid ID. Exibidor ID's should be bigger than 1000"
     print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
     destination_id = input()
+
+
+  timestamp = (int(time.time()))
   
   size_msg = 2
   while True:
@@ -111,12 +115,12 @@ def sendMSG(id_emissor, sequence_id):
       break
   
   #TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
-  fmt_str = "!HHHIH140s"
+  fmt_str = "!HHHIIH140s"
   
   size_msg = len(msg)
-  msg_bytes = struct.pack(fmt_str, MSG, origin_id, destination_id, sequence_id, size_msg, msg)
+  msg_bytes = struct.pack(fmt_str, MSG, origin_id, destination_id, sequence_id, timestamp, size_msg, msg)
 
-  print str(s.getsockname()) + ': sending MSG'
+  print 'LOG: Sending MSG to', destination_id
   s.send(msg_bytes)
 
 
@@ -132,11 +136,13 @@ def sendQEM(id_emissor, sequence_id):
     print "What is the ID of the exibidor?"
     destination_id = input()
 
-  fmt_str = "!HHHI"
+  timestamp = (int(time.time()))
 
-  msg_bytes = struct.pack(fmt_str, QEM, origin_id, destination_id, sequence_id)
+  fmt_str = "!HHHII"
 
-  print str(s.getsockname()) + ': sending MSG'
+  msg_bytes = struct.pack(fmt_str, QEM, origin_id, destination_id, sequence_id, timestamp)
+
+  print 'LOG: Sending MSG to', destination_id
   s.send(msg_bytes)
 
 
@@ -144,24 +150,31 @@ def sendQEM(id_emissor, sequence_id):
 
 # RECEIVE RESPONSE FROM OI MESSAGE
 def receive():
-  fmt_str = "!HHHI"
+  fmt_str = "!HHHII"
   data = s.recv(1024)
   #msg_bytes = struct.pack(fmt_str, *fields_list)
 
   fields_list = struct.unpack(fmt_str, data) 
   data = get_msg(fields_list[0])
-  print '%s: received %s' % (s.getsockname(), data)
+
+  print 'LOG: Received', data, 'from', fields_list[1]
   return data
 
 
 
 # SHOW OPTIONS
 def showOptions():
-  print "Choose an option:"
-  print "(1) Send a message"
-  print "(2) Build an QEM message"
-  print "(3) Terminate exibidor"
-  print "(0) Terminate this"
+  print 
+  print "-------------------------------------------------------"
+  print "|    MENU                                             |"
+  print "-------------------------------------------------------"
+  print "|   (1) Send a message                                |"
+  print "|   (2) Build an QEM message                          |"
+  print "|   (3) Terminate exibidor                            |"
+  print "|   (0) Terminate this                                |"
+  print "-------------------------------------------------------"
+  print "| Your option?", 
+
 
 
 
@@ -169,12 +182,12 @@ def showOptions():
 # CREATE AND CONNECT SOCKET
 server_address = (HOST, PORT)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-print 'connecting to %s port %s' % server_address
+print 'LOG: Connecting to %s port %s' % server_address
 
 try:
   s.connect(server_address)
 except socket.error, exc:
-  print 'Exception caught, socket.error: %s' % exc
+  print 'LOG: Exception caught, socket.error: %s' % exc
 else:
   # GET ID EMISSOR AND START LOOP
   id_emissor = getEmissorID()
@@ -193,6 +206,17 @@ else:
     sequence_id += 1
 
     data = receive()
+    if (data == "ERRO"):
+      print
+      print "-------------------------------------------------------"
+      print "|   ERROR                                             |"
+      print "-------------------------------------------------------"
+      print "|   Error sending OI. Possible causes are:            |"
+      print "|   - Chosen ID already in use                        |"
+      print "|                                                     |"
+      print "|   Please check and try again                        |"
+      print "-------------------------------------------------------"
+      print
 
   showOptions()
   op = input()
@@ -200,18 +224,56 @@ else:
     if op == 1:
       sendMSG(id_emissor, sequence_id)
       sequence_id += 1
-
       data = receive()
+
+      if(data == "ERRO"):
+        print
+        print "-------------------------------------------------------"
+        print "|   ERROR                                             |"
+        print "-------------------------------------------------------"
+        print "|   Error sending message. Possible causes are:       |"
+        print "|   - Incorrect exibidor ID                           |"
+        print "|   - Incorrect origin ID                             |"
+        print "|                                                     |"
+        print "|   Please check and try again                        |"
+        print "-------------------------------------------------------"
+        print
 
     if op == 2:
       sendQEM(id_emissor, sequence_id)
       sequence_id += 1
       data = receive()
 
+      if(data == "ERRO"):
+        print
+        print "-------------------------------------------------------"
+        print "|   ERROR                                             |"
+        print "-------------------------------------------------------"
+        print "|   Error sending message. Possible causes are:       |"
+        print "|   - Incorrect exibidor ID                           |"
+        print "|   - Incorrect origin ID                             |"
+        print "|                                                     |"
+        print "|   Please check and try again                        |"
+        print "-------------------------------------------------------"
+        print
+
     if op == 3:
       sendExibidorFLW(id_emissor, sequence_id)
       sequence_id += 1
       data = receive()
+
+      if(data == "ERRO"):
+        print
+        print "-------------------------------------------------------"
+        print "|   ERROR                                             |"
+        print "-------------------------------------------------------"
+        print "|   Error sending message. Possible causes are:       |"
+        print "|   - Incorrect exibidor ID                           |"
+        print "|   - Incorrect origin ID                             |"
+        print "|                                                     |"
+        print "|   Please check and try again                        |"
+        print "-------------------------------------------------------"
+        print
 
     showOptions()
     op = input()
