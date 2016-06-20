@@ -96,12 +96,9 @@ def sendQEM(id_emissor, sequence_id):
 		print "What is the ID of the exibidor?"
 		destination_id = input()
 
-	size_msg = 0
-	msg = ""
-	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
-	fmt_str = "!HHHIH140s"
+	fmt_str = "!HHHI"
 
-	msg_bytes = struct.pack(fmt_str, QEM, origin_id, destination_id, sequence_id, size_msg, msg)
+	msg_bytes = struct.pack(fmt_str, QEM, origin_id, destination_id, sequence_id)
 
 	print str(s.getsockname()) + ': sending MSG'
 	s.send(msg_bytes)

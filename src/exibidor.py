@@ -81,6 +81,14 @@ def receive():
 		fields_list = struct.unpack(fmt_str, data_received) 
 		print "Message from", str(fields_list[1]) + ':', fields_list[5]
 
+	if(data == "OKQEM"):
+		fmt_str = "!HHHIH"
+		fields_list = struct.unpack_from(fmt_str, data_received) 
+		for i in xrange(fields_list[4]):
+			fmt_str += "H"
+			fields_list = struct.unpack_from(fmt_str, data_received) 
+			print "id:",  fields_list[i+4]
+
 	if(data == "MSG" and fields_list[5] == 'flw'):
 		return "FIM"
 	return data
