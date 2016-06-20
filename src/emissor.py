@@ -35,6 +35,7 @@ def getEmissorID():
 	return id_emissor
 
 
+
 # SEND OI MESSAGE
 def sendOI(id_emissor, sequence_id):
 	origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
@@ -47,6 +48,7 @@ def sendOI(id_emissor, sequence_id):
 
 	print str(s.getsockname()) + ': sending OI'
 	s.send(msg_bytes)
+
 
 
 # SEND FLW MESSAGE
@@ -62,6 +64,8 @@ def sendFLW(id_emissor, sequence_id):
 
 	print str(s.getsockname()) + ': sending FLW'
 	s.send(msg_bytes)
+
+
 
 # SEND MSG MESSAGE
 def sendMSG(id_emissor, sequence_id):
@@ -85,6 +89,8 @@ def sendMSG(id_emissor, sequence_id):
 	print str(s.getsockname()) + ': sending MSG'
 	s.send(msg_bytes)
 
+
+
 # SEND QEM MESSAGE
 def sendQEM(id_emissor, sequence_id):
 	origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
@@ -104,6 +110,8 @@ def sendQEM(id_emissor, sequence_id):
 	s.send(msg_bytes)
 
 
+
+
 # RECEIVE RESPONSE FROM OI MESSAGE
 def receive():
 	fmt_str = "!HHHI"
@@ -115,6 +123,8 @@ def receive():
 	print '%s: received %s' % (s.getsockname(), data)
 	return data
 
+
+
 # SHOW OPTIONS
 def showOptions():
 	print "Choose an option:"
@@ -122,6 +132,8 @@ def showOptions():
 	print "(2) Build an QEM message"
 	print "(3) Terminate exibidor"
 	print "(0) Terminate this"
+
+
 
 
 # CREATE AND CONNECT SOCKET
@@ -154,24 +166,20 @@ else:
 
   showOptions()
   op = input()
-  while(op != 0):
-    
-
-    if(op == 1):
+  while op != 0:
+    if op == 1:
       sendMSG(id_emissor, sequence_id)
       sequence_id += 1
 
       data = receive()
 
-    if(op == 2):
+    if op == 2:
       sendQEM(id_emissor, sequence_id)
       sequence_id += 1
-
       data = receive()
 
     showOptions()
     op = input()
-
 
   sendFLW(id_emissor, sequence_id)
   sequence_id += 1

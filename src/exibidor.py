@@ -41,13 +41,13 @@ def sendOI(id_exibidor, sequence_id):
 	destination_id = 0 			# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
 	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
 
-
 	fmt_str = "!HHHI"
 
 	msg_bytes = struct.pack(fmt_str, OI, origin_id, destination_id, sequence_id)
 
 	print str(s.getsockname()) + ': sending OI'
 	s.send(msg_bytes)
+
 
 
 # SEND FLW MESSAGE
@@ -65,6 +65,7 @@ def sendFLW(id_exibidor, sequence_id):
 
 
 
+
 # RECEIVE RESPONSE FROM MESSAGE
 def receive():
 	fmt_str = "!HHHIH140s"
@@ -73,7 +74,6 @@ def receive():
 
 	fields_list = struct.unpack_from("!HHHI", data_received) 
 	data = get_msg(fields_list[0])
-
 
 	print '%s: received %s' % (s.getsockname(), data)
 
@@ -94,42 +94,42 @@ def receive():
 	return data
 
 
+
 # CREATE AND CONNECT SOCKET
 server_address = (HOST, PORT)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print 'connecting to %s port %s' % server_address
-s.connect(server_address)
 
+try:
+  s.connect(server_address)
+except socket.error, exc:
+  print 'Exception caught, socket.error: %s' % exc
+else:
+  # GET ID EMISSOR AND START LOOP
+  id_exibidor = getExibidorID()
 
+  sequence_id = 0
+  sendOI(id_exibidor, sequence_id)
+  sequence_id += 1
 
-# GET ID EMISSOR AND START LOOP
-id_exibidor = getExibidorID()
+  data = receive()
 
-sequence_id = 0
-sendOI(id_exibidor, sequence_id)
-sequence_id += 1
+  # TODO: SERVER RETURN ERRO WHEN ID IS TAKEN
+  while (data == "ERRO"): # Error with id, ask for a new one
+    id_exibidor = getExibidorID()
 
-data = receive()
+    sendOI(id_exibidor, sequence_id)
+    sequence_id += 1
 
-# TODO: SERVER RETURN ERRO WHEN ID IS TAKEN
-while (data == "ERRO"): # Error with id, ask for a new one
-	id_exibidor = getExibidorID()
+    data = receive()
 
-	sendOI(id_exibidor, sequence_id)
-	sequence_id += 1
+  while(data[0] != "FIM"):
+    data = receive()
 
-	data = receive()
+  sendFLW(id_exibidor, sequence_id)
+  sequence_id += 1
 
-while(data[0] != "FIM"):
-	data = receive()
-
-	
-
-
-sendFLW(id_exibidor, sequence_id)
-sequence_id += 1
-
-data = receive()
-if(data == "OK"):
-	s.close()
+  data = receive()
+  if(data == "OK"):
+    s.close()
 
