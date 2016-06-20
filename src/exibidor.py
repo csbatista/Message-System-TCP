@@ -84,13 +84,12 @@ def receive():
 	if(data == "OKQEM"):
 		fmt_str = "!HHHIH"
 		fields_list = struct.unpack_from(fmt_str, data_received) 
+		print "QEM message requested by ", str(fields_list[1])
 		for i in xrange(fields_list[4]):
 			fmt_str += "H"
 			fields_list = struct.unpack_from(fmt_str, data_received) 
-			print "id:",  fields_list[i+4]
+			print "ID:",  fields_list[i+5]
 
-	if(data == "MSG" and fields_list[5] == 'flw'):
-		return "FIM"
 	return data
 
 
@@ -123,7 +122,7 @@ else:
 
     data = receive()
 
-  while(data[0] != "FIM"):
+  while(data != "FLW"):
     data = receive()
 
   sendFLW(id_exibidor, sequence_id)
