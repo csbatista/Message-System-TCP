@@ -131,53 +131,55 @@ def showOptions():
 server_address = (HOST, PORT)
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print 'connecting to %s port %s' % server_address
-s.connect(server_address)
+
+try:
+  s.connect(server_address)
+except socket.error, exc:
+  print 'Exception caught, socket.error: %s' % exc
+else:
+  # GET ID EMISSOR AND START LOOP
+  id_emissor = getEmissorID()
+
+  sequence_id = 0
+  sendOI(id_emissor, sequence_id)
+  sequence_id += 1
+
+  data = receive()
+
+  # TODO: SERVER RETURN ERRO WHEN ID IS TAKEN
+  while (data == "ERRO"): # Error with id, ask for a new one
+    id_emissor = getEmissorID()
+
+    sendOI(id_emissor, sequence_id)
+    sequence_id += 1
+
+    data = receive()
+
+  showOptions()
+  op = input()
+  while(op != 0):
+    
+
+    if(op == 1):
+      sendMSG(id_emissor, sequence_id)
+      sequence_id += 1
+
+      data = receive()
+
+    if(op == 2):
+      sendQEM(id_emissor, sequence_id)
+      sequence_id += 1
+
+      data = receive()
+
+    showOptions()
+    op = input()
 
 
+  sendFLW(id_emissor, sequence_id)
+  sequence_id += 1
 
-# GET ID EMISSOR AND START LOOP
-id_emissor = getEmissorID()
-
-sequence_id = 0
-sendOI(id_emissor, sequence_id)
-sequence_id += 1
-
-data = receive()
-
-# TODO: SERVER RETURN ERRO WHEN ID IS TAKEN
-while (data == "ERRO"): # Error with id, ask for a new one
-	id_emissor = getEmissorID()
-
-	sendOI(id_emissor, sequence_id)
-	sequence_id += 1
-
-	data = receive()
-
-showOptions()
-op = input()
-while(op != 0):
-	
-
-	if(op == 1):
-		sendMSG(id_emissor, sequence_id)
-		sequence_id += 1
-
-		data = receive()
-
-	if(op == 2):
-		sendQEM(id_emissor, sequence_id)
-		sequence_id += 1
-
-		data = receive()
-
-	showOptions()
-	op = input()
-
-
-sendFLW(id_emissor, sequence_id)
-sequence_id += 1
-
-data = receive()
-if(data == "OK"):
-	s.close()
+  data = receive()
+  if(data == "OK"):
+    s.close()
 
