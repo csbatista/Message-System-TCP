@@ -1,0 +1,8 @@
+- Conferir os sequence id (eu comecei incrementando e fazendo tudo certo, mas depois fui esquecendo, dai tem que ir em todos e conferir. e acho que no servidor nem tem o contador de sequencia tb n)
+
+- adicionar os timestamps (o formato ta na doc, ai tem que acrescentar o campo no pack/unpack, e um I no fmt_str, e nas strings de formato - nao necessarioamente no final, tem q ler na doc a ordem dos trem)
+
+- retornar erro quando o cara envia uma mensagem mas o campo de origem nao ta com o id dele (tipo ele tentando se passar por outra pessoa)
+
+-retornar erro quando o destinatario nao existe
+

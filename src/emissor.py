@@ -65,6 +65,8 @@ def sendFLW(id_emissor, sequence_id):
 	print str(s.getsockname()) + ': sending FLW'
 	s.send(msg_bytes)
 
+
+
 def sendExibidorFLW(id_emissor, sequence_id):
 	origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
 	sequence_id = 0 			# AINDA NAO ESTA SENDO INCREMENTADA
@@ -84,6 +86,8 @@ def sendExibidorFLW(id_emissor, sequence_id):
 	print str(s.getsockname()) + ': sending FLW'
 	s.send(msg_bytes)
 
+
+
 # SEND MSG MESSAGE
 def sendMSG(id_emissor, sequence_id):
 	origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
@@ -94,13 +98,22 @@ def sendMSG(id_emissor, sequence_id):
 		print "That is not a valid ID. Exibidor ID's should be bigger than 1000"
 		print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
 		destination_id = input()
-
+  
 	size_msg = 2
-	print "Type the message (max 140 characters)"
-	msg = raw_input()
+  while True:
+	  print "Type the message (max 140 characters)"
+	  msg = raw_input()
+    if len(msg) > 140:
+      print 'Message too big.'
+    elif len(msg) == 0:
+      print 'Write something'
+    else:
+      break
+  
 	#TIMESTAMP - COMO COLOCAR UNS SHORT DE 4 BYTES NO FORMATO
 	fmt_str = "!HHHIH140s"
-
+  
+  size_msg = len(msg)
 	msg_bytes = struct.pack(fmt_str, MSG, origin_id, destination_id, sequence_id, size_msg, msg)
 
 	print str(s.getsockname()) + ': sending MSG'
