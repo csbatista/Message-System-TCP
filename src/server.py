@@ -60,7 +60,7 @@ message_queues = {}
 
 
 
-def process_oi(fmt_str, data):
+def process_oi(fmt_str, data, s):
   # add to the exibidores list
   existe = False
   if(data[1] > 999):
@@ -104,7 +104,7 @@ def process_oi(fmt_str, data):
 
 
 
-def process_flw(fmt_str, data):
+def process_flw(fmt_str, data, s):
   if (data[2] == 0):
     # remove from the emissores list
     if(data[1] > 1 and data[1] < 1000):
@@ -150,7 +150,7 @@ def process_flw(fmt_str, data):
     message_queues[s].put(msg_bytes)
           
 
-def process_msg(fmt_str, data):
+def process_msg(fmt_str, data, s):
   fmt_str = "!HHHIH140s"
   fields_list = struct.unpack(fmt_str, data_received) 
   data = fields_list
@@ -201,7 +201,7 @@ def process_msg(fmt_str, data):
 
 
 
-def process_qem(fmt_str, data):
+def process_qem(fmt_str, data, s):
   if(data[2] > 0): # if it is only for one exibidor
     origin_id = data[1]          # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
     destination_id = data[2]   # (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
@@ -290,20 +290,20 @@ def handle_inputs(readable):
         
         # received an OI
         if data[0] == 0:  
-          process_oi(fmt_str, data)
+          process_oi(fmt_str, data, s)
         
         # received an FLW
         if data[0] == 1:
-          process_flw(fmt_str, data)
+          process_flw(fmt_str, data, s)
         
         # received an MSG
         if data[0] == 2:
-          process_msg(fmt_str, data)
+          process_msg(fmt_str, data, s)
         
         # received and QEM
         if(data[0] == 5):
-          process_qem(fmt_str, data)
-
+          process_qem(fmt_str, data, s)
+        
         if s not in outputs:
             outputs.append(s)
       else:

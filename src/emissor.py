@@ -90,18 +90,18 @@ def sendExibidorFLW(id_emissor, sequence_id):
 
 # SEND MSG MESSAGE
 def sendMSG(id_emissor, sequence_id):
-	origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
-
-	print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
-	destination_id = input()
-	while(destination_id != 0 and destination_id < 1000):
-		print "That is not a valid ID. Exibidor ID's should be bigger than 1000"
-		print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
-		destination_id = input()
+  origin_id = id_emissor 		# (2 bytes) 0 for server, 1-999 for emissor and +1000 for exibidor
   
-	size_msg = 2
+  print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
+  destination_id = input()
+  while destination_id != 0 and destination_id < 1000:
+    print "That is not a valid ID. Exibidor ID's should be bigger than 1000"
+    print "What is the ID of the exibidor? (type 0 to broadcast the message to all exibidores)"
+    destination_id = input()
+  
+  size_msg = 2
   while True:
-	  print "Type the message (max 140 characters)"
+    print "Type the message (max 140 characters)"
 	  msg = raw_input()
     if len(msg) > 140:
       print 'Message too big.'
