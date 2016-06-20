@@ -308,7 +308,7 @@ def handle_inputs(readable):
             outputs.append(s)
       else:
         # Interpret empty result as closed connection
-        print 'closing', client_address, 'after reading no data'
+        print 'closing', s.getpeername(), 'after reading no data'
         # Stop listening for input on the connection
         if s in outputs:
           outputs.remove(s)
@@ -317,7 +317,6 @@ def handle_inputs(readable):
         
         # Remove message queue
         del message_queues[s]
-                
 
 
 
